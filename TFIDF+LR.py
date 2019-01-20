@@ -64,13 +64,12 @@ for class_name in class_names:
 
     #通过传入的模型，训练三次，最后将三次结果求平均值
     #交叉验证优点：
-
     # 1：交叉验证用于评估模型的预测性能，尤其是训练好的模型在新数据上的表现，可以在一定程度上减小过拟合。
     # 2：还可以从有限的数据中获取尽可能多的有效信息。
     cv_score = np.mean(cross_val_score(classifier, train_features, train_target, cv=3, scoring='roc_auc'))  #sklearn的cross_val_score进行交叉验证
     scores.append(cv_score)
     print('CV score for class {} is {}'.format(class_name, cv_score))
-
+    #交叉验证训练后，做预测
     classifier.fit(train_features, train_target)#训练模型
     submission[class_name] = classifier.predict_proba(test_features)[:, 1]
 
