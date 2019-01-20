@@ -60,7 +60,7 @@ scores = []
 submission = pd.DataFrame.from_dict({'id': test['id']})
 for class_name in class_names:
     train_target = train[class_name]
-    classifier = LogisticRegression(C=0.1, solver='sag')
+    classifier = LogisticRegression(C=0.1, solver='sag')#c为正则化系数  ，solver:即随机平均梯度下降 如果样本量非常大，比如大于10万，sag是第一选择；但不能用于L1正则化。
 
     #通过传入的模型，训练三次，最后将三次结果求平均值
     #交叉验证优点：
