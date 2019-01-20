@@ -35,8 +35,8 @@ word_vectorizer = TfidfVectorizer(
     ngram_range=(1, 1),
     max_features=10000)
 word_vectorizer.fit(all_text)
-train_word_features = word_vectorizer.transform(train_text)
-test_word_features = word_vectorizer.transform(test_text)
+train_word_features = word_vectorizer.transform(train_text)  # 得到tf-idf矩阵，稀疏矩阵表示法
+test_word_features = word_vectorizer.transform(test_text)   # 得到tf-idf矩阵，稀疏矩阵表示法
 
 #2、为了充分表征文本信息，我们也提取文本字的ngram信息，我们将ngram设置为（2，6），
 # 也就是说我们会最少提取两个字母作为单词的信息，最多会提取6个字母作为单词：
@@ -78,12 +78,20 @@ print('Total CV score is {}'.format(np.mean(scores)))
 submission.to_csv(submission.csv, index=False)
 from sklearn.metrics import roc_auc_score
 test_label=pd.read_csv('input/test_labels.csv')
+# submission = pd.read_csv('input/submission.csv')
 auc_sum = 0
 for class_ in class_names:
-    sub_test_label=test_label[test_label.id.isin(test_label[test_label[class_]==-1].id.tolist())==False]
+    # print(test_label[test_label.id.isin(test_label[test_label[class_]==-1].id.tolist())==False])
+    # print(test_label[class_] == -1)
+    sub_test_label=test_label[test_label.id.isin(test_label[test_label[class_]==-1].id.tolist())==False]#取出所有有值的不为-1的 值 #
     sub_submission=submission[submission.id.isin(test_label[test_label[class_]==-1].id.tolist())==False]
     auc_sum += roc_auc_score(sub_test_label[class_],sub_submission[class_])
 print("test_average_auc_score:",auc_sum/len(class_names))
 #备注：如果test_label=-1,该样本的不计入auc的计算中。
 
 #https://www.kaggle.com/tunguz/logistic-regression-with-words-and-char-n-grams
+
+# 为什么还要使用ROC和AUC呢？
+# 因为ROC曲线有个很好的特性：
+# 当测试集中的正负样本的分布变化的时候，ROC曲线能够保持不变
+# 。在实际的数据集中经常会出现类不平衡（class imbalance）现象，即负样本比正样本多很多（或者相反），而且测试数据中的正负样本的分布也可能随着时间变
